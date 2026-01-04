@@ -1,0 +1,132 @@
+import os
+import re
+import csv
+import time
+import asyncio
+import random
+import statistics
+import numpy as np
+from pathlib import Path
+from collections import Counter, OrderedDict
+from itertools import combinations, accumulate, chain
+from functools import lru_cache
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+
+class IndustryStats:
+    """
+    This component defines the core economic and structural characteristics
+    of the debt collection industry. It captures historical and projected
+    market size, growth rates, and overall industry scale. The data also
+    describes market concentration, including revenue distribution among
+    top firms and the prevalence of single-unit agencies. Additionally, it
+    outlines the industry’s client composition and the proportion of
+    consumers contacted by collection agencies.
+    """
+
+    def __init__(self):
+        # Basic industry metrics
+        self.market_size_2020 = 14.99  # $B
+        self.market_size_2021 = 14.99  # flat
+        self.forecast_2025 = 16.7
+        self.cagr = 0.028  # 2.8%
+        self.total_agencies = 7000
+        self.avg_office_revenue = 4.1  # $M
+        self.top_50_share = 52.0  # %
+        self.single_unit_share = 35.0  # %
+        self.top5_market_share = 3.5  # $B
+        self.public_top5 = 2
+        self.non_financial_share = 60.0  # %
+        self.financial_share = 40.0  # %
+        self.consumers_contacted_share = 1 / 3  # ~33%
+
+        self.segment_counter = Counter({'Financial': 40, 'Non-Financial': 60})
+        self.segment_ordered = OrderedDict(sorted(self.segment_counter.items()))
+
+    def revenue_stats(self):
+        """
+        Calculate key statistical measures to summarize revenue-related data
+        within the industry. Computes mean, median, and standard deviation.
+        """
+        revenues = [
+            self.market_size_2020,
+            self.market_size_2021,
+            self.forecast_2025,
+            self.avg_office_revenue * self.total_agencies / 1000  # convert $M to $B approx
+        ]
+        return {
+            "mean_revenue": statistics.mean(revenues),
+            "median_revenue": statistics.median(revenues),
+            "stdev_revenue": statistics.stdev(revenues)
+        }
+
+    @lru_cache(maxsize=32)
+    def cached_mean(self, column_values):
+        """
+        Cache previously calculated mean values for faster repeated computation.
+        """
+        return statistics.mean(column_values)
+
+    def market_simulation(self, iterations=1000):
+        """
+        Monte Carlo simulation to estimate future market size with ±1% random
+        fluctuations. Returns mean, standard deviation, and all simulated samples.
+        """
+        simulated = []
+        for _ in range(iterations):
+            growth = self.cagr + random.uniform(-0.01, 0.01)
+            size_2025 = self.market_size_2020 * ((1 + growth) ** 5)
+            simulated.append(size_2025)
+        return {
+            "simulated_mean": np.mean(simulated),
+            "simulated_std": np.std(simulated),
+            "simulated_samples": simulated
+        }
+
+    async def async_simulation(self, delay=0.01, iterations=100):
+        """
+        Asynchronous simulation using asyncio to model concurrent operations.
+        Returns a list of simulated future market sizes.
+        """
+        results = []
+        for _ in range(iterations):
+            await asyncio.sleep(delay)
+            growth = self.cagr + random.uniform(-0.01, 0.01)
+            size_2025 = self.market_size_2020 * ((1 + growth) ** 5)
+            results.append(size_2025)
+        return results
+
+    def save_csv(self, path="output/market_stats.csv"):
+        """
+        Save industry metrics to a CSV file for persistent storage.
+        """
+        Path("output").mkdir(exist_ok=True)
+        with open(path, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(['Metric', 'Value'])
+            for attr, value in self.__dict__.items():
+                if isinstance(value, (int, float, str)):
+                    writer.writerow([attr, value])
+
+    def clean_string(self, text):
+        """
+        Clean text by replacing non-alphanumeric characters with underscores.
+        """
+        return re.sub(r'\W+', '_', text)
+
+    def summary(self):
+        """Generate textual summary of industry trends."""
+        return f"""
+Industry Summary:
+- Highly fragmented U.S. market with ~{self.total_agencies} agencies (mostly small businesses).
+- Revenue: ${self.market_size_2020}-{self.forecast_2025}B, forecasted CAGR: {self.cagr*100:.1f}%.
+- Non-financial sectors dominate revenue ({self.non_financial_share}%).
+- One-third of consumers are contacted yearly (~{self.consumers_contacted_share*100:.1f}%).
+- Industry consolidation: Top 50 firms capture {self.top_50_share}% of revenue; single-unit operations capture {self.single_unit_share}%.
+- Top 5 companies market share: ${self.top5_market_share}B; Public among top 5: {self.public_top5}.
+- Major trends: Consolidation, AI adoption, outsourcing, regulatory compliance (FDCPA), debt buying growth.
+- Segment counter: {self.segment_counter}
+- Ordered segments: {self.segment_ordered}
+        """

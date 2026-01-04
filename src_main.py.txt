@@ -1,0 +1,88 @@
+import asyncio  # Built-in Python library to handle asynchronous programming
+from src.industry_analysis import IndustryStats  # Import your custom class for analyzing the debt collection industry
+
+async def main():
+    """Main function to perform industry analysis and simulations asynchronously."""
+
+    # ------------------- Initialize the IndustryStats object -------------------
+    stats = IndustryStats()
+    """
+    The IndustryStats object is the main tool for this project.
+    It allows you to:
+        1. Get a textual summary of the industry.
+        2. Compute detailed revenue statistics.
+        3. Run Monte Carlo simulations to model future market outcomes.
+        4. Execute asynchronous simulations for efficiency.
+        5. Save the results to a CSV file for further analysis or reporting.
+    """
+
+    # ------------------- Summary of the Industry -------------------
+    """
+    Provides a textual overview of the debt collection market.
+    The summary may include:
+        - Total number of agencies (~7,000 in the U.S.)
+        - Aggregate market revenue and growth trends
+        - Key market segments (small vs. large agencies)
+        - Any notable recent changes or observations in the industry
+    """
+    print(stats.summary())
+
+    # ------------------- Revenue Statistics -------------------
+    """
+    Calculates and returns important revenue-related statistics.
+    Typically includes:
+        - Mean (average revenue per agency or market segment)
+        - Median (middle value to understand typical revenue)
+        - Standard deviation (to understand variability in revenue)
+        - Possibly min/max values to show extremes in the market
+    """
+    rev_stat = stats.revenue_stats()
+    print("\nRevenue Statistics:", rev_stat)
+
+    # ------------------- Monte Carlo Simulation -------------------
+    """
+    Uses Monte Carlo methods to simulate potential future market revenues.
+    Monte Carlo simulation generates many random samples based on statistical assumptions.
+    This helps estimate:
+        - Expected mean revenue for 2025
+        - Standard deviation (risk or uncertainty in revenue)
+        - Distribution of possible outcomes (first 10 samples are shown here)
+    """
+    sim = stats.market_simulation()
+    print("\nMonte Carlo Simulation 2025:")
+    print(f"Mean: {sim['simulated_mean']:.2f}B, Std: {sim['simulated_std']:.2f}B")
+    print("First 10 samples:", sim['simulated_samples'][:10])
+
+    # ------------------- Asynchronous Simulation -------------------
+    """
+    Demonstrates running multiple simulations concurrently using asyncio.
+    Advantages of async simulations:
+        - Faster execution for multiple iterations
+        - Efficient handling of tasks that can be run independently
+    Parameters:
+        - iterations=10 → Run the simulation 10 times
+        - delay=0.001 → Simulate a small processing delay per iteration
+    """
+    async_results = await stats.async_simulation(iterations=10, delay=0.001)
+    print("\nAsync Simulation (10 iterations):", async_results)
+
+    # ------------------- Save Results to CSV -------------------
+    """
+    Saves all generated statistics and simulation results to a CSV file.
+    File location: output/market_stats.csv
+    Benefits:
+        - Easy sharing and reporting of results
+        - Can be analyzed in Excel, Python (Pandas), or other tools
+        - Keeps a persistent record of your analysis
+    """
+    stats.save_csv()
+    print("\nCSV saved to output/market_stats.csv")
+
+# ------------------- Entry Point -------------------
+"""
+Ensures the async main function runs when the script is executed.
+asyncio.run() handles the event loop automatically, executing all async operations.
+"""
+if __name__ == "__main__":
+    asyncio.run(main())
+

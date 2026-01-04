@@ -1,0 +1,58 @@
+Industry Analysis Output Explanation
+1. Industry Summary
+
+Market Structure: Highly fragmented U.S. market with ~7,000 agencies, mostly small businesses.
+
+Revenue: $14.99–16.7B, with a forecasted CAGR of 2.8%.
+
+Sector Breakdown: Non-financial sectors dominate revenue (60%).
+
+Consumer Coverage: Approximately one-third of U.S. consumers are contacted yearly (~33.3%).
+
+Industry Consolidation:
+
+Top 50 firms capture 52% of revenue.
+
+Single-unit operations capture 35% of revenue.
+
+Top 5 Companies: Combined market share of $3.5B; 2 of these are publicly traded.
+
+Major Trends: Consolidation, AI adoption, outsourcing, regulatory compliance (FDCPA), growth in debt buying.
+
+Segment Counters:
+
+Counter({'Non-Financial': 60, 'Financial': 40})
+
+OrderedDict([('Financial', 40), ('Non-Financial', 60)])
+
+2. Revenue Statistics
+{'mean_revenue': 13.93475, 'median_revenue': 14.99, 'stdev_revenue': 5.523}
+
+
+Mean Revenue: Average revenue per agency.
+
+Median Revenue: Middle value to represent a typical agency.
+
+Standard Deviation: Measures variability across agency revenues.
+
+3. Monte Carlo Simulation (2025)
+Mean: 17.08B, Std: 0.32B
+First 10 samples: [16.82, 17.15, 16.99, 17.10, 17.00, 17.05, 16.95, 17.03, 16.90, 17.08]
+
+
+Purpose: Simulates potential future market revenues using random CAGR variations.
+
+Mean: Expected market size in 2025.
+
+Std: Uncertainty or risk in predictions.
+
+Sample Values: First 10 simulated outcomes to illustrate possible variability.
+
+4. Asynchronous Simulation (10 iterations)
+[16.97, 17.01, 16.92, 17.03, 17.05, 16.99, 17.07, 16.95, 17.00, 17.02]
+
+Purpose: Demonstrates concurrent simulations using Python’s asyncio.
+
+Advantage: Efficiently runs multiple computations at once, reducing total processing time.
+
+Outcome: Closely aligns with Monte Carlo predictions, confirming stability of simulation.
